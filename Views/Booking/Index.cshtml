@@ -1,0 +1,114 @@
+﻿@model IEnumerable<EventEase.Models.Booking>
+
+@{
+    ViewData["Title"] = "Event Ease - Booking";
+    string? selectedStatus = ViewData["Status"]?.ToString();
+}
+
+<h1>Bookings - Event Ease</h1>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</p>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Filter Bookings</h5> @* Changed "Search Bookings" to "Filter Bookings" *@
+    </div>
+    <div class="card-body">
+        <form asp-action="Filter" method="get">
+            @* Changed asp-action="Search" to asp-action="Filter" *@
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="searchTerm">Filter Term</label> @* Changed "Search Term" to "Filter Term" (optional, but good for consistency) *@
+                    <input type="text" id="searchTerm" name="searchTerm" class="form-control"
+                           value="@Context.Request.Query["searchTerm"]" />
+                </div>
+                <div class="col-md-2">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" name="startDate" class="form-control"
+                           value="@Context.Request.Query["startDate"]" />
+                </div>
+                <div class="col-md-2">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" name="endDate" class="form-control"
+                           value="@Context.Request.Query["endDate"]" />
+                </div>
+                <div class="col-md-3">
+                    <label for="venueId">Venue</label>
+                    <select id="venueId" name="venueId" class="form-control"
+                            asp-items="ViewBag.VenueId as SelectList">
+                        <option value="">-- All Venues --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="status">Status</label>
+                    <select id="status" name="status" class="form-control">
+                        <option value="">-- All Statuses --</option>
+                        <option value="Active" selected="@(selectedStatus == "Active")">Active</option>
+                        <option value="Cancelled" selected="@(selectedStatus == "Cancelled")">Cancelled</option>
+                        <option value="Completed" selected="@(selectedStatus == "Completed")">Completed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-12 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary mr-2">Filter</button> @* Changed "Search" to "Filter" *@
+                    <a asp-action="Index" class="btn btn-secondary">Reset</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Event</th>
+            <th>Venue</th>
+            <th>Booking Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Event?.EventName</td>
+                    <td>@item.Venue?.VenueName</td>
+                    <td>@item.BookingDate.ToString("MMMM dd, yyyy")</td>
+                    <td>@item.Status</td>
+                    <td>
+                        <div class="btn-group">
+                            <a asp-action="Details" asp-route-id="@item.BookingId" class="btn btn-sm btn-info">Details</a>
+                            <a asp-action="Edit" asp-route-id="@item.BookingId" class="btn btn-sm btn-warning">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@item.BookingId" class="btn btn-sm btn-danger">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5" class="text-center">No bookings found matching your criteria.</td>
+            </tr>
+        }
+    </tbody>
+</table>

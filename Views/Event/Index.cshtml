@@ -1,0 +1,91 @@
+﻿@model IEnumerable<EventEase.Models.Event>
+
+@{
+    ViewData["Title"] = "Event";
+}
+
+<h1 class="mb-4">Event Ease - Events</h1>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</p>
+
+<!-- FILTER FORM -->
+<form asp-action="Index" method="get" class="form-inline mb-4">
+    <div class="form-group mr-3">
+        <label for="eventTypeId" class="mr-2">Event Type</label>
+        <select id="eventTypeId" name="eventTypeId" class="form-control"
+                asp-items="@(new SelectList(ViewData["EventTypeId"] as SelectList, "Value", "Text"))">
+            <option value="">-- All --</option>
+        </select>
+    </div>
+
+    <div class="form-group mr-3">
+        <label for="venueId" class="mr-2">Venue</label>
+        <select id="venueId" name="venueId" class="form-control"
+                asp-items="@(new SelectList(ViewData["VenueId"] as SelectList, "Value", "Text"))">
+            <option value="">-- All --</option>
+        </select>
+    </div>
+
+    <div class="form-group mr-3">
+        <label for="startDate" class="mr-2">Start Date</label>
+        <input type="date" name="startDate" class="form-control" value="@Context.Request.Query["startDate"]" />
+    </div>
+
+    <div class="form-group mr-3">
+        <label for="endDate" class="mr-2">End Date</label>
+        <input type="date" name="endDate" class="form-control" value="@Context.Request.Query["endDate"]" />
+    </div>
+
+    <button type="submit" class="btn btn-primary mr-2">Filter</button>
+    <a asp-action="Index" class="btn btn-secondary">Clear</a>
+</form>
+
+<!-- EVENT LISTING -->
+<div class="row">
+    @if (!Model.Any())
+    {
+        <div class="col-12">
+            <div class="alert alert-info">No events found for the selected filters.</div>
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model)
+        {
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="row no-gutters">
+                        <div class="col-md-4">
+                            <img src="@item.ImageUrl" class="card-img" alt="@item.EventName">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">@item.EventName</h5>
+                                <p class="card-text text-muted">@item.EventDate.ToString("MMMM dd, yyyy")</p>
+                                <p class="card-text">@item.Description</p>
+                                <p class="card-text"><strong>Venue:</strong> @item.Venue?.VenueName</p>
+                                <p class="card-text"><strong>Event Type:</strong> @item.EventType?.EventTypeName</p>
+                                <div class="btn-group">
+                                    <a asp-action="Details" asp-route-id="@item.EventId" class="btn btn-sm btn-info">Details</a>
+                                    <a asp-action="Edit" asp-route-id="@item.EventId" class="btn btn-sm btn-warning">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@item.EventId" class="btn btn-sm btn-danger">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
